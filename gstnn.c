@@ -14,8 +14,7 @@
 #include "stats.h"
 #include "stopwatch.h"
 
-#define USAGE_FMT "%s [-t FILE] [-h]"
-#define DEFAULT_PROGNAME "gstnn"
+#define USAGE_FMT "%s [-t FILE] [-h] [-f]"
 
 static void report_print(uint64_t total, uint64_t hits, struct stats error,
                          struct stats duration) {
@@ -31,7 +30,7 @@ static void report_print(uint64_t total, uint64_t hits, struct stats error,
 }
 
 void usage(char *progname) {
-    fprintf(stderr, USAGE_FMT "\n", progname ? progname : DEFAULT_PROGNAME);
+    fprintf(stderr, USAGE_FMT "\n", progname);
     exit(EXIT_FAILURE);
     /* NOTREACHED */
 }
@@ -91,7 +90,7 @@ int main(const int argc, char *argv[]) {
                       target_stream) != ARRAY_LENGTH(target)) {
                 err(EXIT_FAILURE, "loading target array");
             }
-            hits += errorl(target, &batch_error);
+            hits += prediction_error(target, &batch_error);
 
             if (!freeze) {
                 train(input);

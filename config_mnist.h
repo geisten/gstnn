@@ -59,7 +59,7 @@ num_type output[OUTPUT_LENGTH * BATCH_LENGTH];
 num_type output_delta[OUTPUT_LENGTH * BATCH_LENGTH];
 
 /**
- * `layer_construct` - Construct the neural network layers.
+ * `layer_construct` - Construct the neural network layer.
  */
 static void layer_construct() {
     if (NULL == (hidden_weights = weights_create_or_load(
@@ -103,13 +103,13 @@ static void predict(const num_type input[INPUT_LENGTH]) {
 }
 
 /**
- * `errorl` - Calculates the error between the output and the expected (target) array.
+ * `prediction_error` - Calculates the error between the output and the expected (target) array.
  *
  * - `target`: The target vector
  * - `error`: The calculated error value
  * Returns the number of hits (output == target)
  */
-static uint64_t errorl(const num_type target[OUTPUT_LENGTH * BATCH_LENGTH],
+static uint64_t prediction_error(const num_type *target,
                        double *error) {
     error[0] =
         vec_delta(OUTPUT_LENGTH * BATCH_LENGTH, output, target, output_delta);
@@ -123,8 +123,7 @@ static uint64_t errorl(const num_type target[OUTPUT_LENGTH * BATCH_LENGTH],
             max_value = output[pos];
         }
         if (target[pos] == 1.0f) {
-            fprintf(stderr, "-->%zu <=> %zu/%f - [%f]  ::", pos, max_pos,
-                    max_value, output[pos]);
+            fprintf(stderr, "expected: %zu, given: %zu, ", pos, max_pos);
             if (pos == max_pos) {
                 ++hits;
             }

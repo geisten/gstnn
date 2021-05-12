@@ -21,11 +21,16 @@ dep = $(obj:.o=.d)
 CFLAGS ?= -I.  -march=native -mtune=native -MP -Wall -Wextra -mavx -Wstrict-overflow -ffast-math -fsanitize=address -O3 -MMD
 LDFLAGS ?= -ffast-math -lm -fsanitize=address -mavx
 
+options:
+	@echo $(PROJECT_NAME) build options:
+	@echo "CFLAGS   = ${CFLAGS}"
+	@echo "LDFLAGS  = ${LDFLAGS}"
+	@echo "CC       = ${CC}"
 
 debug: CFLAGS+= -O0 -g3 -gdwarf -DDEBUG
 debug: $(PROJECT_NAME)
 
-all: $(PROJECT_NAME)  ## build all binaries and libraries
+all: options $(PROJECT_NAME)  ## build all binaries and libraries
 
 # build the executable
 $(PROJECT_NAME): $(obj)
@@ -41,6 +46,10 @@ test: test/test_kern ## run all test programs
 # clean the build
 clean:  ## cleanup - remove the target build files
 	rm -f $(obj) $(dep) $(PROJECT_NAME) test/test_kern test/test_kern.o test/test_kern.d
+
+mnist: ## copy the mnist config file to config.h
+	cp config_mnist.h config.h
+
 
 
 .PHONY: install
