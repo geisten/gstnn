@@ -192,26 +192,28 @@ void weights_norm_init(uint32_t in_size, uint32_t out_size, float *weights) {
     }
 }
 
-void softmax_f32(uint32_t len, float vec[len]) {
-    float max = FLT_MIN;
+uint32_t argmax(uint32_t len, const float x[len], float *max) {
+    *max             = x[0];
+    uint32_t max_pos = 0;
     for (uint32_t i = 0; i < len; i++) {
-        if (vec[i] > max) {
-            max = vec[i];
+        if (x[i] > *max) {
+            *max    = x[i];
+            max_pos = i;
         }
     }
-    float sum = .0f;
-    for (uint32_t i = 0; i < len; i++) {
-        vec[i] = expf(vec[i] - max);
-        sum += vec[i];
-    }
-    for (uint32_t i = 0; i < len; i++) {
-        vec[i] = vec[i] / sum;
-    }
+    return max_pos;
 }
 
-void weights_softmax_f32(uint32_t m, uint32_t n, float vec[m * n]) {
-    for (uint32_t i = 0; i < n; i++) {
-        softmax_f32(m, &vec[i * m]);
+void softmax(uint32_t len, const float x[len], float xs[len]) {
+    float max;
+    argmax(len, x, &max);
+    float sum = .0f;
+    for (uint32_t i = 0; i < len; i++) {
+        xs[i] = expf(x[i] - max);
+        sum += xs[i];
+    }
+    for (uint32_t i = 0; i < len; i++) {
+        xs[i] = xs[i] / sum;
     }
 }
 
