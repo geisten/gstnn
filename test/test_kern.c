@@ -150,6 +150,35 @@ static void test_dropout() {
     vec_write_f32(stdout, ARRAY_LENGTH(y), d, "vector with drop out values");
 }
 
+static void test_argmax() {
+    float y[] = {0.7639f, -0.582f, 0.102f, -0.582f, 0.072f, -0.582f, -0.582f};
+    float max;
+    uint32_t max_pos = argmax(ARRAY_LENGTH(y), y, &max);
+    test(max == 0.7639f && "Argmax should return the max element value");
+    test(max_pos == 0 &&
+         "Argmax should return the position of the max element");
+
+    float y2[] = {-0.7639f, -0.582f, 0.102f, -0.582f, 0.072f, 0.582f, 0.582f};
+    max_pos    = argmax(ARRAY_LENGTH(y2), y2, &max);
+    test(max == 0.582f &&
+         "Argmax should return the first max element value (2)");
+    test(max_pos == 5 &&
+         "Argmax should return the position of the max element (2)");
+}
+
+static void test_softmax() {
+    float x[] = {0.7639f, -0.582f, 0.102f, -0.582f, 0.072f, -0.582f, -0.582f};
+    float xs[ARRAY_LENGTH(x)];
+    softmax(ARRAY_LENGTH(x), x, xs);
+    float sum = 0.0f;
+    for (uint32_t i = 0; i < ARRAY_LENGTH(x); i++) {
+        sum += xs[i];
+    }
+    printf("sum of softmax vector: %f", sum);
+    test(sum >= 0.999f && sum <= 1.0f &&
+         "The sum of the softmax vector elements should be equal 1");
+}
+
 int main() {
     srandom(time(NULL));
     test_trans();
@@ -157,5 +186,7 @@ int main() {
     test_weight_delta();
     test_dropout();
     test_train_adam();
+    test_argmax();
+    test_softmax();
     return TEST_RESULT;
 }

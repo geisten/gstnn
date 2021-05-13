@@ -186,8 +186,38 @@ void weights_norm_init(uint32_t m, uint32_t n, float w[m * n]);
  */
 void matrix_init(uint32_t m, uint32_t n, float matrix[m * n]);
 
+
 /** ## Activation functions and its derivatives
  */
+
+/**
+ * ### argmax()
+ *
+ * Find and return the first max position with max value.
+ *
+ * If the vector contains identical elements, the first position will be returned.
+ *
+ * #### Parameters
+ *
+ *  - `len` The length of the vector.
+ *  - `x` The vector.
+ *  - `*max` The max element value.
+ */
+uint32_t argmax(uint32_t len, const float x[len], float *max);
+
+/**
+ * ### softmax()
+ *
+ * e_x = np.exp(x)
+ * e_x / e_x.sum()
+ *
+ * #### Parameters
+ *
+ *  - `len` The length of the vector.
+ *  - `x` The vector.
+ *  - `xs` The result vector.
+ */
+void softmax(uint32_t len, const float x[len], float xs[len]) ;
 
 /**
  * ### relu()
