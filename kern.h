@@ -1,5 +1,5 @@
 /**
- * # The geisten kern (core) functions - version _0.5-0_
+ * # The geisten kern (core) functions - version _0.6-0_
  *
  *
  *               ╚══╗ ║ ╔════╝
@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define KERN_VERSION "0.5-0"
+#define KERN_VERSION "0.6-0"
 
 /** ## Macros
  */
@@ -215,3 +215,17 @@ void sigmoid_derived(uint32_t len, const float *result, float *delta);
  */
 float *weights_create_or_load(const char *filename, uint32_t input_len,
                               uint32_t output_len);
+
+/**
+ * ### dropout()
+ *
+ * Set random elements in the vector `vec` to _0_. It is allowed for `vec` and `result` to be identical (the same array).
+ *
+ * #### Parameters
+ *
+ *  - `len` The length of the vector.
+ *  - `vec` The original, input vector.
+ *  - `p` The related probability to set the element to _0_.
+ *  - `result` The new vector with some of the elements is set to _0_.
+ */
+void dropout(uint32_t len, const float vec[len], float p, float result[len]) ;

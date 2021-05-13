@@ -58,8 +58,7 @@ void trans(uint32_t batch_len, uint32_t m, uint32_t n, const float *w,
  * w[m * j + $i] -= N * dy[n * $k + j] * x[m * k + $i]
  */
 void train_sgd(uint32_t batch_len, uint32_t m, uint32_t n, const float *vec,
-               const float *delta,
-                   float rate, float *mtrx) {
+               const float *delta, float rate, float *mtrx) {
     uint32_t i, k;
     float *restrict wr;
     const float *restrict xr;
@@ -67,7 +66,8 @@ void train_sgd(uint32_t batch_len, uint32_t m, uint32_t n, const float *vec,
 
     for (uint32_t j = 0; j < n; j++) {
         for (k = 0, wr = &mtrx[m * j]; k < batch_len; k++) {
-            for (i = 0, xr = &vec[k * m], a = rate * delta[k * n + j]; i < m; i++) {
+            for (i = 0, xr = &vec[k * m], a = rate * delta[k * n + j]; i < m;
+                 i++) {
                 wr[i] -= a * xr[i];
             }
         }
@@ -154,8 +154,7 @@ float rand_normal(float mu, float sigma) {
     return (mu + sigma * X1);
 }
 
-void weights_norm_init(uint32_t in_size, uint32_t out_size,
-                           float *weights) {
+void weights_norm_init(uint32_t in_size, uint32_t out_size, float *weights) {
     srandom(time(NULL));
     for (unsigned long long i = 0; i < (in_size * out_size); i++) {
         weights[i] = rand_normal(0.0f, sqrtf(2.0f / in_size));
@@ -239,7 +238,7 @@ void sigmoid_derived(uint32_t len, const float *result, float *delta) {
 }
 
 float *weights_create_or_load(const char *filename, uint32_t input_len,
-                    uint32_t output_len) {
+                              uint32_t output_len) {
     float *weight;
     if (filename == NULL) {
         weight = reallocarray(NULL, input_len * output_len, sizeof(float));
@@ -274,4 +273,14 @@ float *weights_create_or_load(const char *filename, uint32_t input_len,
         close(fd);
     }
     return weight;
+}
+
+static inline float fbernoulli(float p /* must between [0,1] */) {
+    return (float)(p < (((float)random() / (float)(RAND_MAX))));
+}
+
+void dropout(uint32_t len, const float vec[len], float p, float result[len]) {
+    for (uint32_t i = 0; i < len; i++) {
+        result[i] = vec[i] * fbernoulli(p);
+    }
 }

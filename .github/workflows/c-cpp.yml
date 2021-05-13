@@ -1,19 +1,19 @@
 name: C CI
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    push:
+        branches: [ main ]
+        pull_request:
+            branches: [ main ]
 
-jobs:
-  build:
+            jobs:
+                build:
 
-    runs-on: ubuntu-latest
+                    runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
-    - name: make debug
-      run: make debug
-    - name: make test
-      run: make test
+                    steps:
+                        - uses: actions/checkout@v2
+                        - name: make debug
+                          run: make debug
+                        - name: make test
+                          run: make test
