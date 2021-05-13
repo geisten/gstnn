@@ -70,7 +70,7 @@ void trans(uint32_t batch_len, uint32_t m, uint32_t n, const float w[m * n],
  *  - `batch_len` The number of parallel input data.
  *  - `m` The number of input (matrix) rows.
  *  - `n` The number of output (matrix) columns.
- *  - `x` The input vector of length `m`.
+ *  - `x` The input vector of length `m * batch_len`.
  *  - `dy` The delta output (difference between output and expected output) vector  of length `n`.
  *  - `rate` The leaning rate
  *  - `w` The m x n weight matrix.
@@ -78,6 +78,36 @@ void trans(uint32_t batch_len, uint32_t m, uint32_t n, const float w[m * n],
 void train_sgd(uint32_t batch_len, uint32_t m, uint32_t n,
                const float x[m * batch_len], const float dy[n * batch_len],
                float rate, float w[m * n]);
+
+/**
+ * ### train_adam()
+ *
+ * Trains the weight matrix by the adam optimizer
+ *
+ * See [Adam: A Method for Stochastic Optimization](https://arxiv.org/abs/1412.6980)
+ *
+ * ### Parameters
+ *
+ *  - `batch_len` The number of parallel input data.
+ *  - `m` The number of input (matrix) rows.
+ *  - `n` The number of output (matrix) columns.
+ *  - `x` The input vector of length `m * batch_len`.
+ *  - `dy` The delta output (difference between output and expected output) vector  of length `n`.
+ *  - `counter` Counts the iterations
+ *  - `N` The leaning rate
+ *  - `beta1` Default value: `0.9`
+ *  - `beta2` Default value: `0.999`
+ *  - `epsilon` Default value: `10^-8`
+ *  - `w` The m x n weight matrix.
+ *  - `mom` 1st moment vector
+ *  - `veloc` 2nd moment vector
+ *  Returns the incremented counter
+ */
+float train_adam(uint32_t batch_len, uint32_t m, uint32_t n,
+                 const float x[restrict m * batch_len],
+                 const float dy[restrict const n * batch_len], float counter,
+                 float N, float beta1, float beta2, float epsilon,
+                 float w[m * n], float mom[n * m], float veloc[n * m]);
 
 /**
  * ### loss()
@@ -143,6 +173,19 @@ bool vec_is_equal_f32(uint32_t n, const float a[n], const float b[n],
  */
 void weights_norm_init(uint32_t m, uint32_t n, float w[m * n]);
 
+/**
+ * ### matrix_init()
+ *
+ * Initialize a float matrix with `0.0`` values.
+ *
+ * #### Parameters
+ *
+ *  - `m` The rows of the matrix.
+ *  - `n` The columns of the matrix.
+ *  - `matrix` The float matrix.
+ */
+void matrix_init(uint32_t m, uint32_t n, float matrix[m * n]);
+
 /** ## Activation functions and its derivatives
  */
 
@@ -200,6 +243,23 @@ void sigmoid_derived(uint32_t len, const float *result, float *delta);
 /**
  * ### weights_create_or_load()
  *
+ * Allocate a matrix from memory.
+ *
+ * The matrix is not permanent and will be lost when the program ends.
+ *
+ * **The values are not initialized!**
+ *
+ * #### Parameters
+ *
+ *  - `m` The rows of the weight matrix.
+ *  - `n` The columns of the weight matrix.
+ * Returns the allocated matrix memory or NULL if an error occurred.
+ */
+float *matrix_alloc(uint32_t m, uint32_t n);
+
+/**
+ * ### weights_create_or_load()
+ *
  * Create or load the matrix fom a memory mapped file or direct from memory.
  *
  * If filename == NULL, the matrix will be allocated from memory. The weights matrix will be lost when closing the program
@@ -228,4 +288,4 @@ float *weights_create_or_load(const char *filename, uint32_t input_len,
  *  - `p` The related probability to set the element to _0_.
  *  - `result` The new vector with some of the elements is set to _0_.
  */
-void dropout(uint32_t len, const float vec[len], float p, float result[len]) ;
+void dropout(uint32_t len, const float vec[len], float p, float result[len]);

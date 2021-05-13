@@ -33,7 +33,7 @@ Change to the parent directory `cd ..` and run `make mnist` to set up the mnist 
 project.
 
 ```shell
-make mnist
+make config_mnist
 make
 ```
 
