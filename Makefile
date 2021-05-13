@@ -39,8 +39,10 @@ $(PROJECT_NAME): $(obj)
 # build the unit tests
 test/%: test/%.o $(obj)
 	$(CC) -o $@ $< $(LDFLAGS)
+	$@ ||  (echo "Test $^ failed" && exit 1)
 
 test: test/test_kern ## run all test programs
+	@echo "Success, all tests of project '$(PROJECT_NAME)' passed."
 
 .PHONY: clean
 # clean the build

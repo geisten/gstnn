@@ -1,5 +1,5 @@
 
-# The geisten kern (core) functions - version _0.5-0_
+# The geisten kern (core) functions - version _0.6-0_
 
 
               ╚══╗ ║ ╔════╝
@@ -169,4 +169,16 @@ If the filename != NULL, the matrix will be saved and updated in the file
  - `input_len` The columns of the weight matrix.
 
  Returns the allocated matrix memory.
+
+
+### dropout()
+
+Set random elements in the vector `vec` to _0_. It is allowed for `vec` and `result` to be identical (the same array).
+
+#### Parameters
+
+ - `len` The length of the vector.
+ - `vec` The original, input vector.
+ - `p` The related probability to set the element to _0_.
+ - `result` The new vector with some of the elements is set to _0_.
 
