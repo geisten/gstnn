@@ -59,6 +59,58 @@ static void test_train_sgd() {
          "Calculate w -= N * x^T * y");
 }
 
+/*
+ * TODO check mom and veloc result with expected values
+ */
+static void test_train_adam() {
+    float x[] = {0.4f, 0.8f, 0.1f, 0.66f, 0.2f};
+    float y[] = {0.7639f, -0.582f, 0.102f, -0.582f, 0.072f, -0.582f, -0.582f};
+    float w[] = {
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+    };
+
+    float w_expected[] = {
+        -1.00000, -1.00000, -1.00000, -1.00000, -1.00000, 1.00000,  1.00000,
+        1.00000,  1.00000,  1.00000,  -1.00000, -1.00000, -0.99995, -1.00000,
+        -0.99999, 1.00000,  1.00000,  1.00000,  1.00000,  1.00000,  -0.99999,
+        -1.00000, -0.99990, -1.00000, -0.99998, 1.00000,  1.00000,  1.00000,
+        1.00000,  1.00000,  1.00000,  1.00000,  1.00000,  1.00000,  1.00000,
+    };
+
+    float mom[] = {
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+    };
+
+    float vel[] = {
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+        0.0f, 0.0f, 0.0f, 0.0f, 0.0f,  //
+    };
+
+    const int M = ARRAY_LENGTH(x);
+    const int N = ARRAY_LENGTH(y);
+    train_adam(1, M, N, x, y, 1.0f, 1.0f, 0.9f, .99f, 1e-8f, w, mom, vel);
+    vec_write_f32(stdout, N * M, w, "calculated result");
+    test(vec_is_equal_f32(N * M, w_expected, w, 0.001) &&
+         "Calculate adam optimization");
+}
+
 static void test_weight_delta() {
     float x[] = {0.0f, 0.0f, 0.0f, 0.0f, 0.2f};
     float y[] = {0.7639f, -0.582f, 0.102f, -0.582f, 0.072f, -0.582f, -0.582f};
@@ -104,5 +156,6 @@ int main() {
     test_train_sgd();
     test_weight_delta();
     test_dropout();
+    test_train_adam();
     return TEST_RESULT;
 }

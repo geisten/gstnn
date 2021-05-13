@@ -49,9 +49,8 @@ test: test/test_kern ## run all test programs
 clean:  ## cleanup - remove the target build files
 	rm -f $(obj) $(dep) $(PROJECT_NAME) test/test_kern test/test_kern.o test/test_kern.d
 
-mnist: ## copy the mnist config file to config.h
-	cp config_mnist.h config.h
-
+config_%: ## copy a config file to config.h
+	cp $@.h config.h
 
 
 .PHONY: install

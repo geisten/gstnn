@@ -57,8 +57,9 @@ void trans(uint32_t batch_len, uint32_t m, uint32_t n, const float *w,
  * w(m,n)^T -= N * dy(l,n)^T * x(l,m)
  * w[m * j + $i] -= N * dy[n * $k + j] * x[m * k + $i]
  */
-void train_sgd(uint32_t batch_len, uint32_t m, uint32_t n, const float *vec,
-               const float *delta, float rate, float *mtrx) {
+void train_sgd(uint32_t batch_len, uint32_t m, uint32_t n,
+               const float vec[m * batch_len], const float delta[n * batch_len],
+               float rate, float mtrx[m * n]) {
     uint32_t i, k;
     float *restrict wr;
     const float *restrict xr;
@@ -72,6 +73,36 @@ void train_sgd(uint32_t batch_len, uint32_t m, uint32_t n, const float *vec,
             }
         }
     }
+}
+
+/*
+ * adam optimizer for the weight matrix
+ */
+float train_adam(uint32_t batch_len, uint32_t m, uint32_t n,
+                 const float x[restrict m * batch_len],
+                 const float dy[restrict const n * batch_len], float counter,
+                 float N, float beta1, float beta2, float epsilon,
+                 float w[m * n], float mom[n * m], float veloc[n * m]) {
+    float *restrict wr;
+    float *restrict mr;
+    float *restrict vr;
+    const float *restrict xr;
+    float dr;
+    uint32_t k, i;
+    for (uint32_t j = 0; j < n; j++) {
+        for (k = 0, wr = &w[m * j], vr = &veloc[j * m], mr = &mom[j * m];
+             k < batch_len; k++) {
+            for (i = 0, xr = &x[k * m], dr = dy[k * n + j]; i < m; i++) {
+                const float g      = dr * xr[i];
+                mr[i]              = beta1 * mr[i] + ((1 - beta1) * g);
+                const float mr_hat = mr[i] / (1 - powf(beta1, counter));
+                vr[i] = beta2 * vr[i] + ((1 - beta2) * (powf(g, 2)));
+                const float vr_hat = vr[i] / (1 - powf(beta2, counter));
+                wr[i] -= N * mr_hat / (sqrtf(vr_hat + epsilon));
+            }
+        }
+    }
+    return counter + 1.0f;
 }
 
 /*
@@ -237,11 +268,24 @@ void sigmoid_derived(uint32_t len, const float *result, float *delta) {
     vec_derived_f32(len, result, delta, derived_fsigmoid);
 }
 
+/*
+ * Allocate memory for a float matrix.
+ */
+float *matrix_alloc(uint32_t m, uint32_t n) {
+    return reallocarray(NULL, m * n, sizeof(float));
+}
+
+void matrix_init(uint32_t m, uint32_t n, float matrix[m * n]) {
+    for (uint32_t i = 0; i < m * n; i++) {
+        matrix[i] = 0.0f;
+    }
+}
+
 float *weights_create_or_load(const char *filename, uint32_t input_len,
                               uint32_t output_len) {
     float *weight;
     if (filename == NULL) {
-        weight = reallocarray(NULL, input_len * output_len, sizeof(float));
+        weight = matrix_alloc(input_len, output_len);
         weights_norm_init(input_len, output_len, weight);
     } else {
         struct stat statbuf;
