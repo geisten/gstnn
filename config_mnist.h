@@ -109,25 +109,18 @@ static void predict(const num_type input[INPUT_LENGTH]) {
  * - `error`: The calculated error value
  * Returns the number of hits (output == target)
  */
-static uint64_t prediction_error(const num_type *target,
-                       double *error) {
+static uint64_t prediction_error(const num_type *target, double *error) {
     error[0] =
         vec_delta(OUTPUT_LENGTH * BATCH_LENGTH, output, target, output_delta);
     uint64_t hits = 0;
 
-    size_t max_pos  = SIZE_MAX;
     float max_value = -INFINITY;
-    for (size_t pos = 0; pos < OUTPUT_LENGTH; pos++) {
-        if (output[pos] > max_value) {
-            max_pos   = pos;
-            max_value = output[pos];
-        }
-        if (target[pos] == 1.0f) {
+    for (uint32_t i = 0; i < BATCH_LENGTH; i++) {
+        size_t max_pos =
+            argmax(OUTPUT_LENGTH, &output[i * OUTPUT_LENGTH], &max_value);
+        if (target[i * OUTPUT_LENGTH + max_pos] == 1.0f) {
             fprintf(stderr, "expected: %zu, given: %zu, ", pos, max_pos);
-            if (pos == max_pos) {
-                ++hits;
-            }
-            break;
+            ++hits;
         }
     }
     return hits;
