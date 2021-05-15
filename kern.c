@@ -4,6 +4,7 @@
 
 #include "kern.h"
 
+#include <cblas.h>
 #include <err.h>
 #include <fcntl.h>
 #include <float.h>
@@ -34,18 +35,8 @@
  */
 void trans(uint32_t batch_len, uint32_t m, uint32_t n, const float *w,
            const float *x, float *y) {
-    uint32_t i, j, k;
-    const float *restrict wr;
-    float *restrict yr;
-    const float *restrict xr;
-
-    for (k = 0; k < batch_len; k++) {
-        for (j = 0, yr = &y[k * n], xr = &x[k * m]; j < n; j++) {
-            for (i = 0, wr = &w[m * j], yr[j] = 0; i < m; i++) {
-                yr[j] += wr[i] * xr[i];
-            }
-        }
-    }
+    cblas_sgemm(CblasColMajor, CblasNoTrans, CblasNoTrans, batch_len, n, m,
+                1.0f, x, batch_len, w, m, 0.0f, y, batch_len);
 }
 
 /*
@@ -58,21 +49,10 @@ void trans(uint32_t batch_len, uint32_t m, uint32_t n, const float *w,
  * w[m * j + $i] -= N * dy[n * $k + j] * x[m * k + $i]
  */
 void train_sgd(uint32_t batch_len, uint32_t m, uint32_t n,
-               const float vec[m * batch_len], const float delta[n * batch_len],
-               float rate, float mtrx[m * n]) {
-    uint32_t i, k;
-    float *restrict wr;
-    const float *restrict xr;
-    float a;
-
-    for (uint32_t j = 0; j < n; j++) {
-        for (k = 0, wr = &mtrx[m * j]; k < batch_len; k++) {
-            for (i = 0, xr = &vec[k * m], a = rate * delta[k * n + j]; i < m;
-                 i++) {
-                wr[i] -= a * xr[i];
-            }
-        }
-    }
+               const float x[m * batch_len], const float y[n * batch_len],
+               float rate, float w[m * n]) {
+    cblas_sgemm(CblasRowMajor, CblasTrans, CblasNoTrans, n, m, batch_len, -rate,
+                y, n, x, m, 1.0f, w, m);
 }
 
 /*
@@ -112,17 +92,8 @@ float train_adam(uint32_t batch_len, uint32_t m, uint32_t n,
  */
 void loss(uint32_t batch_len, uint32_t m, uint32_t n, const float *w,
           const float *dy, float *dx) {
-    const float *restrict dyr;
-    float *restrict dxr;
-    uint32_t i, j, k;
-    for (k = 0; k < batch_len; k++) {
-        for (i = 0, dxr = &dx[k * m], dyr = &dy[k * n]; i < m; i++) {
-            MP_LOOP()
-            for (j = 0, dxr[i] = 0.0f; j < n; ++j) {
-                dxr[i] += dyr[j] * w[m * j + i];
-            }
-        }
-    }
+    cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, batch_len, m, n, 1.0f,
+                dy, n, w, m, .0f, dx, m);
 }
 
 /*

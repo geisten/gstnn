@@ -18,8 +18,8 @@ obj = $(src:.c=.o)
 dep = $(obj:.o=.d)
 
 
-CFLAGS ?= -I.  -march=native -mtune=native -MP -Wall -Wextra -mavx -Wstrict-overflow -ffast-math -fsanitize=address -O3 -MMD
-LDFLAGS ?= -ffast-math -lm -fsanitize=address -mavx
+CFLAGS ?= -I. -march=native -mtune=native -MP -Wall -Wextra -mavx -Wstrict-overflow -ffast-math -fsanitize=address -O3 -MMD
+LDFLAGS ?= -ffast-math -lm -fsanitize=address -mavx -fopenmp -lopenblas -lpthread
 
 options:
 	@echo $(PROJECT_NAME) build options:
