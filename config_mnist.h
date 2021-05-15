@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "kern.h"
+#include "stats.h"
 
 /**
  * num_type - The type of the neural network cell (weights, input, output, etc.)
@@ -106,22 +107,32 @@ static void predict(const num_type input[INPUT_LENGTH]) {
  * `prediction_error` - Calculates the error between the output and the expected (target) array.
  *
  * - `target`: The target vector
- * - `error`: The calculated error value
- * Returns the number of hits (output == target)
+ * Returns the The calculated error value
  */
-static uint64_t prediction_error(const num_type *target, double *error) {
-    error[0] =
-        vec_delta(OUTPUT_LENGTH * BATCH_LENGTH, output, target, output_delta);
-    uint64_t hits = 0;
+static double prediction_error(const num_type *target) {
+    return vec_delta(OUTPUT_LENGTH * BATCH_LENGTH, output, target,
+                     output_delta);
+}
 
-    float max_value = -INFINITY;
+/*
+ * Change this procedure to adapt the monitoring (logging) output on stdout.
+ */
+static uint64_t monitor(uint32_t target_len, const num_type *target,
+                        struct stats error, struct stats duration,
+                        uint64_t total, uint64_t hits) {
+    float max_value;
+    (void)error;
+    (void)duration;
+    (void)total;
     for (uint32_t i = 0; i < BATCH_LENGTH; i++) {
         size_t max_pos =
             argmax(OUTPUT_LENGTH, &output[i * OUTPUT_LENGTH], &max_value);
-        if (target[i * OUTPUT_LENGTH + max_pos] == 1.0f) {
-            fprintf(stderr, "expected: %zu, given: %zu, ", pos, max_pos);
+        size_t target_pos =
+            argmax(target_len, &target[i * target_len], &max_value);
+        if (target_pos == max_pos) {
             ++hits;
         }
+        fprintf(stderr, ", %zu, %zu", target_pos, max_pos);
     }
     return hits;
 }

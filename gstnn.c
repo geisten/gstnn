@@ -20,10 +20,7 @@ static void report_print(uint64_t total, uint64_t hits, struct stats error,
                          struct stats duration) {
     double time_rsdev  = stats_rsdev_unbiased(&duration);
     double error_rsdev = stats_rsdev_unbiased(&error);
-    fprintf(stderr,
-            "error: %1.4e ± %4.02f%%, "
-            "accuracy: "
-            "%.4f, error rate: %.3f%%, E(t): %5.2eus ± %4.02f%%\n",
+    fprintf(stderr, "%1.4e, %4.02f, %.4f, %.3f, %5.2e, %4.02f",
             stats_mean(&error), error_rsdev, (double)hits / (double)total,
             (100.0 * (1.0 - (double)hits / (double)total)),
             stats_mean(&duration), time_rsdev);
@@ -63,7 +60,7 @@ int main(const int argc, char *argv[]) {
     input_stream = stdin;
     for (int i = optind; i < argc; i++) {
         input_stream = fopen(argv[i], "r");
-        break; //stop after first file parameter is read
+        break;  //stop after first file parameter is read
     }
 
     // Create the data arrays
@@ -90,7 +87,7 @@ int main(const int argc, char *argv[]) {
                       target_stream) != ARRAY_LENGTH(target)) {
                 err(EXIT_FAILURE, "loading target array");
             }
-            hits += prediction_error(target, &batch_error);
+            batch_error = prediction_error(target);
 
             if (!freeze) {
                 train(input);
@@ -100,6 +97,10 @@ int main(const int argc, char *argv[]) {
             stats_collect2(&error_stats, batch_error);
 
             report_print(++total, hits, error_stats, avg_duration);
+            hits = monitor(ARRAY_LENGTH(target), target, error_stats,
+                           avg_duration, total, hits);
+            //create new line and close the monitor output
+            fprintf(stderr, "\n");
         }
 
         // Write the resulting output array to stdout

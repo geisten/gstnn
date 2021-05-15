@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "kern.h"
+#include "stats.h"
 
 /**
  * num_type - The type of the neural network cell (weights, input, output, etc.)
@@ -37,7 +38,10 @@ typedef float num_type;
  * the model in response to the estimated error each time the model weights
  * are updated.
  */
-#define LEARN_RATE 0.05f
+#define LEARN_RATE 0.001f
+#define BETA1 0.9f
+#define BETA2 0.999f
+#define EPSILON 1e-8f
 
 /**
  * The length of the hidden layer
@@ -138,28 +142,31 @@ static void predict(const num_type input[INPUT_LENGTH]) {
  * `prediction_error` - Calculates the error between the output and the expected (target) array.
  *
  * - `target`: The target vector
- * - `error`: The calculated error value
- * Returns the number of hits (output == target)
+ * Returns the The calculated error value
  */
-static uint64_t prediction_error(const num_type *target, double *error) {
-    error[0] =
-        vec_delta(OUTPUT_LENGTH * BATCH_LENGTH, output, target, output_delta);
-    uint64_t hits = 0;
+static double prediction_error(const num_type *target) {
+    return vec_delta(OUTPUT_LENGTH * BATCH_LENGTH, output, target,
+                     output_delta);
+}
 
-    size_t max_pos  = SIZE_MAX;
-    float max_value = -INFINITY;
-    for (size_t pos = 0; pos < OUTPUT_LENGTH; pos++) {
-        if (output[pos] > max_value) {
-            max_pos   = pos;
-            max_value = output[pos];
+/*
+ * Change this procedure to adapt the monitoring (logging) output on stdout.
+ */
+static uint64_t monitor(uint32_t target_len, const num_type *target, struct stats error, struct stats duration,
+                        uint64_t total, uint64_t hits) {
+    float max_value;
+    (void)error;
+    (void)duration;
+    (void)total;
+    for (uint32_t i = 0; i < BATCH_LENGTH; i++) {
+        size_t max_pos =
+            argmax(OUTPUT_LENGTH, &output[i * OUTPUT_LENGTH], &max_value);
+        size_t target_pos =
+            argmax(target_len, &target[i * target_len], &max_value);
+        if (target_pos == max_pos) {
+            ++hits;
         }
-        if (target[pos] == 1.0f) {
-            fprintf(stderr, "expected: %zu, given: %zu, ", pos, max_pos);
-            if (pos == max_pos) {
-                ++hits;
-            }
-            break;
-        }
+        fprintf(stderr, ", %zu, %zu", target_pos, max_pos);
     }
     return hits;
 }
@@ -177,12 +184,12 @@ static void train(const num_type input[INPUT_LENGTH * BATCH_LENGTH]) {
                               hidden_delta);
     hidden_counter =
         train_adam(BATCH_LENGTH, INPUT_LENGTH, HIDDEN_LENGTH, input,
-                   hidden_delta, hidden_counter, 0.001f, 0.9f, 0.999f, 1e-8f,
-                   hidden_weights, hidden_mom, hidden_veloc);
+                   hidden_delta, hidden_counter, LEARN_RATE, BETA1, BETA2,
+                   EPSILON, hidden_weights, hidden_mom, hidden_veloc);
     OUTPUT_ACTIVATION_DERIVED(BATCH_LENGTH * OUTPUT_LENGTH, output,
                               output_delta);
     output_counter =
         train_adam(BATCH_LENGTH, HIDDEN_LENGTH, OUTPUT_LENGTH, hidden_output,
-                   output_delta, hidden_counter, 0.001f, 0.9f, 0.999f, 1e-8f,
-                   output_weights, output_mom, output_veloc);
+                   output_delta, output_counter, LEARN_RATE, BETA1, BETA2,
+                   EPSILON, output_weights, output_mom, output_veloc);
 }
