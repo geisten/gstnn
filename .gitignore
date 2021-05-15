@@ -8,6 +8,7 @@ test/test_stopwatch
 *.f32
 *.tar.gz
 *.dat
+config.h
 
 # Compiler Specifics
 .clangd/

@@ -1,0 +1,48 @@
+.Dd $Mdocdate$
+.Dt GSTNN 1
+.Os
+.Sh NAME
+.Nm gstnn
+.Nd transform the standard input to the predicted standard output
+.Sh SYNOPSIS
+.Nm gstnn
+.Op Fl h
+.Op Fl f
+.Op Fl t Ar TARGET_FILE
+.Op INPUT_FILE
+.Sh DESCRIPTION
+.Nm gstnn
+is a deep learning programm for POSIX like systems. It is running in two modes: predicting and training.
+It reads input from the standard input and writes the result to the standard output.
+If a FILE is given, gstnn uses the data read from the FILE as target data to fit the deep learning model.
+When in training mode, the error rate and the accuracy is printed to the standard error (stderr).
+Train the neural network with the target data read from
+.Nm FILE.
+The arguments are as follows:
+.Bl -tag -width Ds
+.It Fl f
+Don't train (freeze) the net.
+.It Fl h
+Print the help text.
+.It Fl t Ar TARGET_FILE
+Set the target file to train the net.
+.El
+.Sh EXIT STATUS
+The
+.Nm gstnn
+program exits 0 on success, and <> 0 if an error occurs.
+.Sh MONITORING
+During learning, text information about the current state is sent to stderr. The comma separated output is as follows:
+.Bl -tag -width Ds
+.It average error
+.It error deviation in percent
+.It average accuracy
+.It error rate (percent)
+.It average duration time of a single processing step
+.El
+
+.Sh EXAMPLES
+Run the neural network and predict
+Train the neural network
+.Sh AUTHORS
+.An Dr. Germar Schlegel
