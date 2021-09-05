@@ -5,7 +5,7 @@
 #
 #======================================================================
 
-PROJECT_NAME = gstnn
+PROJECT_NAME = geisten
 PREFIX ?= /usr/local
 
 MKDIR_P ?= mkdir -p
@@ -13,13 +13,15 @@ RM ?= rm
 
 #--------------------------- DON'T change this part ----------------------------
 
-src = $(wildcard *.c)
+src = $(wildcard verify/*.c) $(wildcard test/*.c)
 obj = $(src:.c=.o)
 dep = $(obj:.o=.d)
 
 
-CFLAGS ?= -I. -march=native -mtune=native -MP -Wall -Wextra -mavx -Wstrict-overflow -ffast-math -fsanitize=address -O3 -MMD
-LDFLAGS ?= -ffast-math -lm -fsanitize=address -mavx -fopenmp -lopenblas -lpthread
+# CFLAGS ?= -I. -march=native -mtune=native -MP -Wall -Wextra -mavx -Wstrict-overflow -ffast-math -fsanitize=address -O3 -MMD
+CFLAGS ?= -I. -march=native -mtune=native -MP -Wall -Wextra -mavx -Wstrict-overflow -ffast-math -fsanitize=address -O -MMD -g2
+
+LDFLAGS ?= -ffast-math -lm -fsanitize=address -mavx -fopenmp -lpthread
 
 options:
 	@echo $(PROJECT_NAME) build options:
@@ -32,22 +34,36 @@ debug: $(PROJECT_NAME)
 
 all: options $(PROJECT_NAME)  ## build all binaries and libraries
 
-# build the executable
+%.o : %.c
+	$(CC) $(CFLAGS) -c $< $(LIB_PATH) $(LIBS) -o $@ $(LDFLAGS)
+
+# build the objewct file
 $(PROJECT_NAME): $(obj)
 	$(CC) -o $@ $^ $(LDFLAGS)
+
+lib%.a: %.o stats.o  ## link geisten blas library files into a static library
+	ar rcs $@ $+
+	ranlib $@
 
 # build the unit tests
 test/%: test/%.o $(obj)
 	$(CC) -o $@ $< $(LDFLAGS)
 	$@ ||  (echo "Test $^ failed" && exit 1)
 
-test: test/test_kern ## run all test programs
+test: test/test_geisten_i8 ## run all test programs
 	@echo "Success, all tests of project '$(PROJECT_NAME)' passed."
+
+# build the integration tests
+verify/%: verify/%.o
+	$(CC) -o $@ $< $(LDFLAGS)
+	#$@ -t data/mnist_train_targets.i8 data/mnist_train_images.i8  ||  (echo "Test $^ failed" && exit 1)
+
+verify_mnist_i8: verify/mnist_i8
 
 .PHONY: clean
 # clean the build
 clean:  ## cleanup - remove the target build files
-	rm -f $(obj) $(dep) $(PROJECT_NAME) test/test_kern test/test_kern.o test/test_kern.d
+	rm -f $(obj) $(dep) $(PROJECT_NAME) test/test_kern test/*.o test/*.d verify/mnist_i8
 
 config_%: ## copy a config file to config.h
 	cp $@.h config.h

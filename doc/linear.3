@@ -1,0 +1,58 @@
+.Dd $Mdocdate: July 29 2021 $
+.Dt LINEAR 3
+.Os
+.Sh NAME
+.Nm linear
+.Nd linear transformation of an input matrix to an output matrix
+.Sh SYNOPSIS
+.In geisten_f32.h
+.Ft void
+.Fn linear_f32 "uint32_t batch_len" "uint32_t m" "uint32_t n" "const float w[m * n]" "const float x[m * batch_len]" "float y[n * batch_len]"
+.In geisten_i16.h
+.Ft void
+.Fn linear_i16 "uint32_t batch_len" "uint32_t m" "uint32_t n" "const int16_t w[m * n]" "const int16_t x[m * batch_len]" "int16_t y[n * batch_len]"
+.In geisten_i8.h
+.Ft void
+.Fn linear_i8 "uint32_t batch_len" "uint32_t m" "uint32_t n" "const int8_t w[m * n]" "const int8_t x[m * batch_len]" "int8_t y[n * batch_len]"
+.Sh DESCRIPTION
+The
+.Fn linear
+function transforms an input matrix to an output matrix.
+The functions available for specific data types depend on the library used.
+.Sh RETURN VALUES
+There are no return values.
+.Sh ENVIRONMENT
+-
+.Sh EXAMPLES
+To transform a 2 x 3
+.Va float
+matrix
+to a 2 x 4
+.Va float
+matrix
+
+.Bd -literal -offset indent
+#include <geisten_f32.h>
+
+const uint32_t l=2, m=3, n=4;
+const float w[] = {0.3f, 0.1f, 0.7f, 0.3f, 0.1f, 0.7f, 0.3f, 0.1f, 0.7f, 0.3f, 0.1f, 0.7f};
+const float x[] = {0.7f, 0.3f, 0.1f, 0.3f, 0.8f, 0.1f};
+float y[l * n];
+
+trans_f32(l, m, n, w, x, y);
+.Ed
+.Pp
+.Sh ERRORS
+No specific errors.
+.Sh SEE ALSO
+.Xr train_sgd 3 ,
+.Xr train_adam 3
+
+.Sh HISTORY
+The function first appeared in
+.Va 2021
+in the geisten_f32 C library.
+.Sh CAVEATS
+still unknown.
+
+

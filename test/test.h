@@ -33,13 +33,4 @@ static inline int test_result() {
     return test_status.tests_failed ? EXIT_FAILURE : EXIT_SUCCESS;
 }
 
-static void vec_write_f32(FILE *fp, uint64_t size, const float arr[static size],
-                          const char str[]) {
-    fprintf(fp, "%s: [", str);
-    for (uint64_t i = 0; i < size; i++) {
-        fprintf(fp, "%.5f, ", arr[i]);
-    }
-    fprintf(fp, "]\n");
-}
-
 #define TEST_RESULT test_result()

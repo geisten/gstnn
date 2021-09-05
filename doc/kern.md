@@ -27,7 +27,7 @@ neural networks.
  ## Functions
 
 
-### trans()
+### trans_f32()
 
 Transform input data array to output array via a weight matrix.
 

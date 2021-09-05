@@ -1,0 +1,33 @@
+#function run
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+verify/mnist_i8 -t data/mnist_train_targets.i8 data/mnist_train_images.i8 > /dev/null
+

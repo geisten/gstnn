@@ -14,6 +14,10 @@ gstnn is a neural net processing engine written in **C**. It allows you to creat
 meant for newbies and non-programmers. The library is designed for “scalability, speed and ease-of-use” as well as
 optimized for Unix/POSIX (*BSD, Linux, MacOSX) like environments.
 
+> What I cannot create, I do not understand
+> 
+> -- <cite>Richard Feynman</cite>
+
 ## Getting Started
 
 The easiness of this application can be demonstrated very well by the famous MNIST data set for learning handwritten
