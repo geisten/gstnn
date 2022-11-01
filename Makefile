@@ -46,11 +46,11 @@ lib%.a: %.o stats.o  ## link geisten blas library files into a static library
 	ranlib $@
 
 # build the unit tests
-test/%: test/%.o $(obj)
+test/%: test/%.o
 	$(CC) -o $@ $< $(LDFLAGS)
 	$@ ||  (echo "Test $^ failed" && exit 1)
 
-test: test/test_geisten_i8 ## run all test programs
+test: test/test_geisten_bit ## run all test programs
 	@echo "Success, all tests of project '$(PROJECT_NAME)' passed."
 
 # build the integration tests
